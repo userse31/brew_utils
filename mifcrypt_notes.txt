@@ -1,0 +1,9 @@
+For whatever insane reason, brew encrypts mif files. Idk, maybe it was to try
+and thwart people from pirating software? Honestly its not very good at that...
+
+Anyway, on boot the kernel (or something) checks fs:/mif/ for any new mif files.
+
+After finding a new one and doing its shenanigans, it encrypts it.
+
+Thankfully the encryption is quite shit. Brew xor's the mif file with a key of
+random values. How it generated the key is anyones guess!
