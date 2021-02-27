@@ -6,7 +6,6 @@ all:
 install:
 	mkdir /opt/brew_utils
 	cp ./dumpbar /opt/brew_utils
-	cp ./dumpsig /opt/brew_utils
 	cp ./dumpmif /opt/brew_utils
 	cp ./reado01 /opt/brew_utils
 	ln -s /opt/brew_utils/dumpbar /bin/dumpbar
