@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct TOC_Member{
 uint16_t type;
@@ -26,7 +27,7 @@ if(argc==1){
 }
 for(int i=1;i<argc;i++){
 	if(!strcmp(argv[i],"--help")){
-		printf("Usage: dumpbar [options] -o <file>\n");
+		printf("Usage: dumpbar -o <file>\n");
 		exit(0);
 	}
 	if(!strcmp(argv[i],"-o")){
@@ -89,19 +90,21 @@ printf("Number of mod resources %i\n",offset_table_len);
 //printf("Length of offset table: %i\n",offset_table_offset[3]-offset_table_offset[1]);
 uint32_t *offset_table=malloc(sizeof(uint32_t)*offset_table_len);
 rewind(fp);
+//create new directory for resources to prevent clogging up the current working one.
+system("mkdir ./extract_bar");
 fseek(fp,(long)offset_table_start,SEEK_SET);
-fread(offset_table,sizeof(uint32_t),offset_table_len,fp);
+fread(offset_table,sizeof(uint32_t),offset_table_len,fp);//obtain fresh offset table
 uint16_t current[1];
 char *dd=malloc(sizeof(char)*512);
 char *output_name=malloc(sizeof(char)*32);
-for(int i=0;i<offset_table_len;i++){
+for(int i=0;i<offset_table_len;i++){//main extraction bit.
 	printf("Offset %i:0x%08x\n",i+1,offset_table[i]);
 	fread(current,sizeof(current),1,fp);
 	sprintf(output_name,"modrsc0x%04x.%i",toc[i].id,toc[i].type);
 	if(i<offset_table_len-1){
-		sprintf(dd,"dd if=%s of=%s bs=1 skip=%i count=%i status=progress",argv[path],output_name,offset_table[i]+2,offset_table[i+1]-(offset_table[i]+2));
+		sprintf(dd,"dd if=%s of=./extract_bar/%s bs=1 skip=%i count=%i status=progress",argv[path],output_name,offset_table[i]+2,offset_table[i+1]-(offset_table[i]+2));
 	}else{
-		sprintf(dd,"dd if=%s of=%s bs=1 skip=%i status=progress",argv[path],output_name,offset_table[i]+2);
+		sprintf(dd,"dd if=%s of=./extract_bar/%s bs=1 skip=%i status=progress",argv[path],output_name,offset_table[i]+2);
 	}
 	printf("%s\n",dd);
 	system(dd);

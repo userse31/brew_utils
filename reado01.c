@@ -9,6 +9,7 @@
 
 int main(int argc, char *argv[]){
 FILE *fp;
+FILE *fp_write;
 int strip=0;
 int do_count=0;
 int do_length=0;
@@ -18,9 +19,10 @@ if(argc==1){
 	exit(0);
 }
 int path=0;
+int path2=0;
 for(int i=1;i<argc;i++){
 	if(!strcmp(argv[i],"--help")){
-		printf("Usage: reado01 [options] -o <file>\nOptions:\n-o: File to open\n-s: Only strip text. Doesn't print anything else but the strings or the world will explode!\n-c: Count number of strings\n-l: Sum total string lengths\n-xml: dump as xml format\n");
+		printf("Usage: reado01 [options] -o <file>\nOptions:\n-o: File to open\n-s: Only strip text. Doesn't print anything else but the strings or the world will explode!\n-c: Count number of strings\n-l: Sum total string lengths\n-cfg: dump into format o01create can use.\n");
 		exit(0);
 	}
 	if(!strcmp(argv[i],"-o")){
@@ -38,8 +40,11 @@ for(int i=1;i<argc;i++){
 	if(!strcmp(argv[i],"-l")){
 		do_length=1;
 	}
-	if(!strcmp(argv[i],"-xml")){
-		do_xml=1;
+	if(!strcmp(argv[i],"-cfg")){
+		if(!(i+1>argc)){
+			path2=i+1;
+			i++;
+		}
 	}
 }
 fp=fopen(argv[path],"r");
@@ -50,6 +55,15 @@ if(fp==NULL){ //Gotta Learn how to survive null pointers. Thats how you develop 
 if(path==0){
 printf("No file specified\n");
 exit(0);
+}
+if(path==0){
+printf("No file specified\n");
+exit(0);
+}
+fp_write=fopen(argv[path2],"w+");
+if(fp_write==NULL){
+	perror(argv[path2]);
+	exit(0);
 }
 int32_t buffer[]={0,0};
 char *string_buffer; //puts string here.
@@ -62,9 +76,6 @@ if(!do_xml || !strip){
 }
 int count=1;
 int total_size=0;
-if(do_xml){
-	printf("<?xml version=\"1.0\">\n<mao/>\n");
-}
 while(1){
 	readed=fread(buffer,sizeof(int32_t),2,fp);
 	check_readed
@@ -72,6 +83,7 @@ while(1){
 		if(!strip){
 			printf("String id %i\n",buffer[0]);
 			printf("String length %i\n",buffer[1]);
+			fprintf(fp_write,"%i;",buffer[0]);
 			if(do_count){
 				printf("String number %i\n",count);
 				count++;
@@ -82,18 +94,19 @@ while(1){
 			}
 		}
 	}else{
-		printf("<string id=\"%i\">",buffer[0]);
+		0;
 	}
 	string_buffer=malloc(sizeof(char)*buffer[1]);
 	fread(string_buffer,sizeof(char),buffer[1],fp);
 	if(!do_xml){
 		if(!strip){
 		printf("String: %s\n",string_buffer);
+		fprintf(fp_write,"%s%c",string_buffer,0x00);
 		}else{
 		fwrite(string_buffer,sizeof(char),buffer[1],stdout);
 		}
 	}else{
-		printf("%s%c</string>\n",string_buffer,0x00);
+		printf("%s%c",string_buffer,0x00);
 	}
 	free(string_buffer);
 }
