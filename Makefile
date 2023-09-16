@@ -8,6 +8,7 @@ all:
 	$(CC) dumpsig.c -o ./bin/dumpsig
 	$(CC) brew_file.c -o ./bin/brew_file
 	$(CC) writeo01.c -o ./bin/writeo01
+	$(CC) dumpbci.c -o ./bin/dumpbci
 install:
 	mkdir /opt/brew_utils
 	cp -r ./bin/ /opt/brew_utils/

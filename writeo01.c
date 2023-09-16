@@ -68,7 +68,7 @@ _done=0;
 str_len_total=0;
 str_count_total=0;
 if(argc<3){
-	printf("./o01create <in> <out>\n");
+	printf("./writeo01 <in> <out>\n");
 	return 0;
 }
 fp=fopen(argv[1],"r");
